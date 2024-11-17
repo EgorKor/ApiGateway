@@ -2,16 +2,16 @@ package config.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import util.Pair;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
 public class ApiGatewayConfig {
 
     private Map<String, String> proxyRoutes;
-    private Map<String, String> securedProxyRoutes;
+    private Map<String, Pair<String, List<String>>> securedProxyRoutes;
     public ApiGatewayConfig(){
         proxyRoutes = new HashMap<>();
         securedProxyRoutes = new HashMap<>();
@@ -22,8 +22,8 @@ public class ApiGatewayConfig {
         return this;
     }
 
-    public ApiGatewayConfig addSecuredProxyRoute(String route, String proxy){
-        securedProxyRoutes.put(route, proxy);
+    public ApiGatewayConfig addSecuredProxyRoute(String route, String proxy, String ... roles){
+        securedProxyRoutes.put(route, Pair.of(proxy, new ArrayList<>(Arrays.stream(roles).toList())));
         return this;
     }
 

@@ -14,7 +14,11 @@
       <version>1.18.36</version>
       <scope>provided</scope>
     </dependency>
-
+    <dependency>
+      <groupId>com.auth0</groupId>
+      <artifactId>java-jwt</artifactId>
+      <version>3.18.2</version> <!-- Проверьте наличие самой последней версии -->
+    </dependency>
   </dependencies>
   <build>
     <plugins>

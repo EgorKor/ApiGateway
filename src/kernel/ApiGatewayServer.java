@@ -13,7 +13,6 @@ public class ApiGatewayServer {
     private final HttpServer kernelServer;
     private final ServerConfig serverConfig;
     private final ApiGatewayConfig apiGatewayConfig;
-    private IGatewayConfigLoader gatewayConfigLoader;
 
     public ApiGatewayServer(){
         this(() -> ServerConfig
