@@ -1,6 +1,7 @@
-package proxyHandling;
+package proxyHandling.util;
 
 import com.sun.net.httpserver.HttpExchange;
+import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.io.InputStream;
@@ -8,21 +9,43 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * Класс предоставляющий утилитные методы для работы с проксируемыми запросами
+ */
 public class ProxyHandlerUtil {
     private ProxyHandlerUtil() {
     }
 
+    /**
+     * Метод для проксирования запроса на адрес proxyUrl, данные для проксирования берутся из
+     * HttpExchange, копируются заголовки и тело запроса. Результат работы метода - объект из которого
+     * можно вытащить Response
+     */
     @SneakyThrows
-    public static void handleProxy(URL proxyUrl, HttpExchange exchange) {
+    public static HttpURLConnection sendProxyRequest(URL proxyUrl, HttpExchange exchange) {
         HttpURLConnection connection = (HttpURLConnection) proxyUrl.openConnection();
         //копируем заголовки
         copyRequestHeaders(connection, exchange);
+        connection.setRequestMethod(exchange.getRequestMethod());
         //копируем тело
         if (exchange.getRequestMethod().equalsIgnoreCase("POST") ||
                 exchange.getRequestMethod().equalsIgnoreCase("PUT") ||
                 exchange.getRequestMethod().equalsIgnoreCase("PATCH")) {
             copyRequestBody(connection, exchange);
         }
+        connection.connect();
+        connection.getResponseCode();
+        return connection;
+    }
+
+    /**
+     * Метод для проксирования запроса на адрес proxyUrl м возврата ответа изначальному
+     * отправителю
+     */
+    @SneakyThrows
+    public static void sendProxyResponse(URL proxyUrl, HttpExchange exchange) {
+        HttpURLConnection connection = sendProxyRequest(proxyUrl, exchange);
+        connection.connect();
         int responseCode = connection.getResponseCode();
         //копируем заголовки ответа
         copyResponseHeaders(connection, exchange);
@@ -33,7 +56,7 @@ public class ProxyHandlerUtil {
     }
 
     @SneakyThrows
-    private static void copyRequestHeaders(HttpURLConnection connection, HttpExchange exchange) {
+    public static void copyRequestHeaders(HttpURLConnection connection, HttpExchange exchange) {
         connection.setRequestMethod(exchange.getRequestMethod());
         connection.setDoOutput(true);
         exchange.getRequestHeaders().forEach((key, values) -> {
@@ -44,7 +67,7 @@ public class ProxyHandlerUtil {
     }
 
     @SneakyThrows
-    private static void copyRequestBody(HttpURLConnection connection, HttpExchange exchange) {
+    public static void copyRequestBody(HttpURLConnection connection, HttpExchange exchange) {
         try (InputStream is = exchange.getRequestBody();
              OutputStream os = connection.getOutputStream()) {
             byte[] buffer = new byte[8192];
@@ -56,7 +79,7 @@ public class ProxyHandlerUtil {
     }
 
     @SneakyThrows
-    private static void copyResponseBody(HttpURLConnection connection, HttpExchange exchange) {
+    public static void copyResponseBody(HttpURLConnection connection, HttpExchange exchange) {
         try (InputStream is = connection.getInputStream();
              OutputStream os = exchange.getResponseBody()) {
             byte[] buffer = new byte[8192];
@@ -68,7 +91,7 @@ public class ProxyHandlerUtil {
     }
 
     @SneakyThrows
-    private static void copyResponseHeaders(HttpURLConnection connection, HttpExchange exchange) {
+    public static void copyResponseHeaders(HttpURLConnection connection, HttpExchange exchange) {
         connection.getHeaderFields().forEach((key, values) -> {
             if (key != null) {
                 for (String value : values) {
