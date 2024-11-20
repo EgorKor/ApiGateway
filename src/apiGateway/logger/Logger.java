@@ -1,10 +1,5 @@
-package logger;
+package apiGateway.logger;
 
-import lombok.extern.java.Log;
-
-import javax.swing.text.DateFormatter;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 
 public class Logger {

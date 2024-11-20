@@ -1,7 +1,6 @@
-package proxyHandling.util;
+package apiGateway.proxyHandling.util;
 
 import com.sun.net.httpserver.HttpExchange;
-import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.io.InputStream;
@@ -100,5 +99,7 @@ public class ProxyHandlerUtil {
             }
         });
     }
+
+
 
 }

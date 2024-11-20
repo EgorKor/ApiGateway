@@ -1,14 +1,14 @@
-package proxyHandling.handler;
+package apiGateway.proxyHandling.handler;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import config.model.RoutingConfig;
-import config.model.pair.ProxyResponseThisServerExchangePair;
-import config.model.pair.ProxyRouteDetails;
-import logger.Logger;
+import apiGateway.config.model.RoutingConfig;
+import apiGateway.config.model.pair.ProxyResponseThisServerExchangePair;
+import apiGateway.config.model.pair.ProxyRouteDetails;
+import apiGateway.logger.Logger;
 import lombok.AllArgsConstructor;
-import proxyHandling.util.ProxyHandlerUtil;
-import util.Pair;
+import apiGateway.proxyHandling.util.ProxyHandlerUtil;
+import apiGateway.util.Pair;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -43,12 +43,14 @@ public class RouterHandler implements HttpHandler {
             } catch (IllegalArgumentException e) {
                 String message = e.getMessage();
                 logException(e.getMessage(), exchange);
+                e.printStackTrace();
                 exchange.sendResponseHeaders(404, message.getBytes().length);
                 exchange.getResponseBody().write(message.getBytes());
                 exchange.close();
             }
         }catch (Exception e){
             Logger.error(e.getMessage());
+            e.printStackTrace();
             exchange.sendResponseHeaders(500,e.getMessage().getBytes().length);
             exchange.getResponseBody().write(e.getMessage().getBytes());
             exchange.close();
@@ -62,10 +64,10 @@ public class RouterHandler implements HttpHandler {
     private Pair<ProxyRouteDetails, String> findProxyRoute(String url) throws IllegalArgumentException{
         for(ProxyRouteDetails details : routingConfig.getTemplateRoutes()){
             if(routeMatches(details.getTemplateRoutePair().getTemplate(), url)){
-                if(details.isProxyRequestURL()){
-                    return Pair.of(details,details.getTemplateRoutePair().getTemplate() + url);
+                if(!details.isProxyRequestURL()){
+                    return Pair.of(details,details.getTemplateRoutePair().getProxyURL());
                 }
-                return Pair.of(details,details.getTemplateRoutePair().getProxyURL());
+                return Pair.of(details,details.getTemplateRoutePair().getProxyURL() + url);
             }
         }
         throw new IllegalArgumentException("no proxy for this route");

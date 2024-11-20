@@ -1,4 +1,4 @@
-package util;
+package apiGateway.util;
 
 
 import lombok.Getter;

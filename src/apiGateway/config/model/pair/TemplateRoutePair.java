@@ -1,4 +1,4 @@
-package config.model.pair;
+package apiGateway.config.model.pair;
 
 import lombok.Getter;
 import lombok.Setter;

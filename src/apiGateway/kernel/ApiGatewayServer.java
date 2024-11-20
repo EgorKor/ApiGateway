@@ -1,15 +1,14 @@
-package kernel;
+package apiGateway.kernel;
 
 import com.sun.net.httpserver.HttpServer;
-import config.loader.IConfigLoader;
-import config.loader.IGatewayConfigLoader;
-import config.model.RoutingConfig;
-import config.model.ServerConfig;
-import config.model.pair.ProxyRouteDetails;
-import logger.Logger;
+import apiGateway.config.loader.IConfigLoader;
+import apiGateway.config.loader.IGatewayConfigLoader;
+import apiGateway.config.model.RoutingConfig;
+import apiGateway.config.model.ServerConfig;
+import apiGateway.config.model.pair.ProxyRouteDetails;
+import apiGateway.logger.Logger;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
-import proxyHandling.handler.RouterHandler;
+import apiGateway.proxyHandling.handler.RouterHandler;
 
 import java.net.InetSocketAddress;
 import java.util.List;

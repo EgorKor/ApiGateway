@@ -1,9 +1,8 @@
-package config.model.pair;
+package apiGateway.config.model.pair;
 
 import com.sun.net.httpserver.HttpExchange;
 import lombok.Getter;
 import lombok.Setter;
-import proxyHandling.util.ProxyHandlerUtil;
 
 import java.net.HttpURLConnection;
 

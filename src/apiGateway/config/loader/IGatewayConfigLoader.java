@@ -1,6 +1,6 @@
-package config.loader;
+package apiGateway.config.loader;
 
-import config.model.RoutingConfig;
+import apiGateway.config.model.RoutingConfig;
 
 @FunctionalInterface
 public interface IGatewayConfigLoader {

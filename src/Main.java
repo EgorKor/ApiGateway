@@ -1,13 +1,14 @@
-import config.loader.IConfigLoader;
-import config.loader.IGatewayConfigLoader;
-import config.model.RoutingConfig;
-import config.model.ServerConfig;
-import kernel.ApiGatewayServer;
-import proxyHandling.util.ProxyHandlerUtil;
+import apiGateway.config.loader.IConfigLoader;
+import apiGateway.config.loader.IGatewayConfigLoader;
+import apiGateway.config.model.RoutingConfig;
+import apiGateway.config.model.ServerConfig;
+import apiGateway.kernel.ApiGatewayServer;
+import apiGateway.proxyHandling.util.ProxyHandlerUtil;
+import apiGatewayPostActions.AuthenticatePostAction;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,20 +19,9 @@ public class Main {
                 .port(8080)
                 .build();
         IGatewayConfigLoader iGatewayConfigLoader = () ->
-                RoutingConfig.builder().addRoute("/api/v1/calcService/getAccess", "http://localhost:8082/api/v1/auth/echo", (o) -> {
-                    try {
-                        HttpURLConnection connection = (HttpURLConnection) new URL("http://localhost:8081/api/v1/calcService/getAccess").openConnection();
-                        connection.setRequestMethod("GET");
-                        connection.connect();
-                        connection.getResponseCode();
-                        ProxyHandlerUtil.copyResponseHeaders(connection, o.getThisServerExchange());
-                        o.getThisServerExchange().sendResponseHeaders(connection.getResponseCode(), connection.getContentLengthLong());
-                        ProxyHandlerUtil.copyResponseBody(connection, o.getThisServerExchange());
-                        o.getThisServerExchange().close();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                },false);
+                RoutingConfig.builder().addRoute("/api/v1/calcService/auth/getAccess", "http://localhost:8082/api/v1/auth",
+                        new AuthenticatePostAction("http://localhost:8081/api/v1/calcService/auth/getAccess"),false)
+                        .addRoute("/api/v1/calcService/*","http://localhost:8081",true);
         ApiGatewayServer apiGatewayServer = new ApiGatewayServer(iConfigLoader, iGatewayConfigLoader);
         apiGatewayServer.start();
     }

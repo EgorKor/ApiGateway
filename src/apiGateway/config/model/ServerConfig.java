@@ -1,4 +1,4 @@
-package config.model;
+package apiGateway.config.model;
 
 import lombok.Builder;
 import lombok.Data;

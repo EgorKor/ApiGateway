@@ -1,6 +1,6 @@
-package config.loader;
+package apiGateway.config.loader;
 
-import config.model.ServerConfig;
+import apiGateway.config.model.ServerConfig;
 
 @FunctionalInterface
 public interface IConfigLoader {

@@ -1,8 +1,8 @@
-package config.model;
+package apiGateway.config.model;
 
-import config.model.pair.ProxyResponseThisServerExchangePair;
-import config.model.pair.ProxyRouteDetails;
-import config.model.pair.TemplateRoutePair;
+import apiGateway.config.model.pair.ProxyResponseThisServerExchangePair;
+import apiGateway.config.model.pair.ProxyRouteDetails;
+import apiGateway.config.model.pair.TemplateRoutePair;
 import lombok.Getter;
 import lombok.Setter;
 
