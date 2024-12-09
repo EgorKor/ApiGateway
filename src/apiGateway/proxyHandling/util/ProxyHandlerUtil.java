@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Класс предоставляющий утилитные методы для работы с проксируемыми запросами
@@ -29,7 +30,8 @@ public class ProxyHandlerUtil {
         //копируем тело
         if (exchange.getRequestMethod().equalsIgnoreCase("POST") ||
                 exchange.getRequestMethod().equalsIgnoreCase("PUT") ||
-                exchange.getRequestMethod().equalsIgnoreCase("PATCH")) {
+                exchange.getRequestMethod().equalsIgnoreCase("PATCH") ||
+                exchange.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
             copyRequestBody(connection, exchange);
         }
         connection.connect();
@@ -44,13 +46,15 @@ public class ProxyHandlerUtil {
     @SneakyThrows
     public static void sendProxyResponse(URL proxyUrl, HttpExchange exchange) {
         HttpURLConnection connection = sendProxyRequest(proxyUrl, exchange);
-        connection.connect();
+        String responseBody = new String(connection.getInputStream().readAllBytes());
         int responseCode = connection.getResponseCode();
+        connection.disconnect();
         //копируем заголовки ответа
+        exchange.sendResponseHeaders(responseCode, responseBody.getBytes().length);
         copyResponseHeaders(connection, exchange);
-        exchange.sendResponseHeaders(responseCode, connection.getContentLengthLong());
         //копируем
-        copyResponseBody(connection, exchange);
+        exchange.getResponseHeaders().put("content-type", List.of("application/json"));
+        exchange.getResponseBody().write(responseBody.getBytes());
         exchange.close();
     }
 

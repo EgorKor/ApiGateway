@@ -23,10 +23,16 @@ public class AuthenticatePostAction implements Consumer<ProxyResponseThisServerE
     public void accept(ProxyResponseThisServerExchangePair proxyResponseThisServerExchangePair) {
         try {
             HttpURLConnection proxyResponse = proxyResponseThisServerExchangePair.getProxyResponse();
+            if(proxyResponse.getResponseCode() != 200){
+                proxyResponseThisServerExchangePair.getThisServerExchange().sendResponseHeaders(403,-1);
+                proxyResponseThisServerExchangePair.getThisServerExchange().close();
+                return;
+            }
             String responseBody = new String(proxyResponse.getInputStream().readAllBytes());
             Logger.info("Readed %s in postAction".formatted(responseBody));
             String contentType = proxyResponse.getContentType();
             proxyResponse.disconnect();
+
 
             HttpURLConnection authConnection = (HttpURLConnection) new URL(authURL).openConnection();
             authConnection.setRequestMethod("POST");
@@ -42,11 +48,9 @@ public class AuthenticatePostAction implements Consumer<ProxyResponseThisServerE
             String cookieHeader = "Set-Cookie";
             List<String> cookieValues = authConnection.getHeaderFields().get(cookieHeader);
             thisServerExchange.getResponseHeaders().put(cookieHeader,cookieValues);
-            thisServerExchange.getResponseHeaders().put("content-type",List.of(contentType));
-
+            thisServerExchange.getResponseHeaders().put("content-type",List.of("application/json"));
             thisServerExchange.sendResponseHeaders(authResponseCode, authResponseBody.length());
             thisServerExchange.getResponseBody().write(authResponseBody.getBytes());
-
             thisServerExchange.close();
         } catch (Exception e) {
             e.printStackTrace();

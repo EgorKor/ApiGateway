@@ -13,6 +13,7 @@ import apiGateway.util.Pair;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Класс реализующий обработку всех запросов и роутинг этих запросов
@@ -30,7 +31,18 @@ public class RouterHandler implements HttpHandler {
      * ресурса вызывается postAction который завершает обработку проксирования*/
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+
         try {
+            exchange.getResponseHeaders().put("Access-Control-Allow-Origin", List.of("*"));
+            exchange.getResponseHeaders().put("Access-Control-Allow-Methods",List.of("GET, POST, PUT, DELETE"));
+            exchange.getResponseHeaders().put("Access-Control-Allow-Headers",List.of("Content-Type, Authorization"));
+            exchange.getResponseHeaders().put("Access-Control-Allow-Credentials",List.of("true"));
+            exchange.getResponseHeaders().put("Access-Control-Expose-Headers",List.of("Content-Length, Content-Type"));
+            exchange.getResponseHeaders().add("Access-Control-Max-Age", "3600");
+            if(exchange.getRequestMethod().equalsIgnoreCase("OPTIONS")){
+                sendCORSResponse(exchange);
+                return;
+            }
             String url = String.valueOf(exchange.getRequestURI());
             try {
                 Pair<ProxyRouteDetails, String> details = findProxyRoute(exchange.getRequestURI().toString());
@@ -55,6 +67,12 @@ public class RouterHandler implements HttpHandler {
             exchange.getResponseBody().write(e.getMessage().getBytes());
             exchange.close();
         }
+    }
+
+    private void sendCORSResponse(HttpExchange exchange) throws IOException {
+
+        exchange.sendResponseHeaders(204,-1);
+        exchange.close();
     }
 
     private void logException(String message, HttpExchange exchange){

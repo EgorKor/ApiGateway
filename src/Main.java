@@ -19,7 +19,7 @@ public class Main {
                 .port(8080)
                 .build();
         IGatewayConfigLoader iGatewayConfigLoader = () ->
-                RoutingConfig.builder().addRoute("/api/v1/calcService/auth/getAccess", "http://localhost:8082/api/v1/auth",
+                    RoutingConfig.builder().addRoute("/api/v1/calcService/auth/getAccess", "http://localhost:8082/api/v1/auth",
                         new AuthenticatePostAction("http://localhost:8081/api/v1/calcService/auth/getAccess"),false)
                         .addRoute("/api/v1/calcService/*","http://localhost:8081",true);
         ApiGatewayServer apiGatewayServer = new ApiGatewayServer(iConfigLoader, iGatewayConfigLoader);
